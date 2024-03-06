@@ -13,10 +13,9 @@ int BinarySearch(int* nums,int target,int left,int right){
   else 
     return BinarySearch(nums,target,left,mid-1);
 }//log2(n)
-
-//基础知识
+--------------------------------------------------------------
+//线性表
 //初始化，获取元素，插入元素，删除元素，获取长度，进阶版数组；可顺序存储，可链式存储
-//顺序表
 typedef int E;
 struct List{
   E * array;
@@ -52,4 +51,15 @@ bool deleteList(ArrayList list,int index){
     list->array[i]=list->array[i+1];
   list->size--;
   return 1;
+}
+----------------------------------------------------------------
+//链表
+//不需要申请连续的空间，物理不相连，逻辑相连；带头结点的链表，不带头结点的链表
+struct ListNode{
+  E element;
+  struct ListNode * next;
+};
+typedef struct ListNode * Node;
+void initList(Node node){
+  node->next=NULL;
 }
