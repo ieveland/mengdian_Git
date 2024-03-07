@@ -1,3 +1,5 @@
+//线性表
+-------------------------------------------------------------------
 //eg.二分搜索
 int search(int* nums,int numsSize,int target){
   for(int i=0;i<numsSize;i++)
@@ -13,8 +15,8 @@ int BinarySearch(int* nums,int target,int left,int right){
   else 
     return BinarySearch(nums,target,left,mid-1);
 }//log2(n)
---------------------------------------------------------------
-//线性表
+-------------------------------------------------------------------
+//顺序表
 //初始化，获取元素，插入元素，删除元素，获取长度，进阶版数组；可顺序存储，可链式存储
 typedef int E;
 struct List{
@@ -54,7 +56,7 @@ bool deleteList(ArrayList list,int index){
 }
 ----------------------------------------------------------------
 //链表
-//不需要申请连续的空间，物理不相连，逻辑相连；带头结点的链表，不带头结点的链表
+//表长未知（表长不包括头结点），不需要申请连续的空间，物理不相连，逻辑相连；带头结点的链表，不带头结点的链表
 struct ListNode{
   E element;
   struct ListNode * next;
@@ -63,16 +65,109 @@ typedef struct ListNode * Node;
 void initList(Node node){
   node->next=NULL;
 }
-bool insertList(Node head,E element,int index){
+bool insertList(Node head,E element,int index){//头结点不存数据
   if(index<1)return 0;
   while(--index){
-    head=head->next;
-    if(head==NULL)return 0;
+    head=head->next;//把结点从头结点挪到index-1的位置
+    if(head==NULL)return 0;//null就说明插入index位置超过已有链表长度了
   }//插入在index的位置
   Node node=malloc(sizeof(struct ListNode));
   if(node==NULL)return 0;
   node->element=element;
   node->next=head->next;
-  head->next=node;  
+  head->next=node;
   return 1;
 }
+bool deleteList(Node head,int index){
+  if(index<1)return 0;
+  while(--index){
+    head=head->next;
+    if(head==NULL)return 0;
+  }//因为这里到达的是index-1的位置
+  if(head->next==NULL)return 0;//index的位置为空
+  Node tmp=head->next;
+  head->next=head->next->next;
+  free(tmp);
+  return 1;
+}
+//双向链表
+struct ListNode{
+  E element;
+  struct ListNode * next;
+  struct ListNode * prev;
+};
+typedef struct ListNode * Node;
+void initList(Node node){
+  node->next=node->prev=NULL;
+}
+bool insertList(Node head,E element,int index){
+  if(index<1)return 0;
+  while(--index){
+    head=head->next;
+    if(head==NULL)return 0;
+  }
+  Node node=malloc(sizeof(struct ListNode));
+  if(node==NULL)return 0;
+  node->element=element;
+  if(head->next){是否插入尾部
+    head->next->prev=node;
+    node->next=head->next;
+  }else{
+    node->next=NULL;
+  }
+  head->next=node;
+  node->prev=head;
+  return 1;
+}
+bool deleteList(Node head,int index){
+  if(index<1)return 0;
+  while(--index){
+    head=head->next;
+    if(head==NULL)return 0;
+  }
+  if(head==NULL)return 0;
+  Node tmp=head->next;
+  if(head->next->next){
+    head->next=head->next->next;  
+    head->next->next->prev=head;
+  }else{
+    head->next=NULL;    
+  }
+  free(tmp);
+  return 1;
+}
+--------------------------------------------------------------------
+//栈FILO
+//顺序表实现栈
+struc Stack{
+  E * array;
+  int capacity;
+  int top;//栈顶元素下标
+};
+typedef struct Stack * ArrayStack;
+bool initStack(ArrayStack stack){
+  stack->array=malloc(sizeof(E)*10);
+  if(stack->array==NULL)return 0;
+  stack->capacity=10;
+  stack->top=-1;//0指的栈底元素
+  return 1;
+}
+bool pushStack(ArrayStack stack,E element){
+  if(stack->top==stack->capacity){//可扩容版本
+    int newCapacity=stack->capacity+(stack->capacity>>1);
+    E * newArray=realloc(stack->array,newCapacity*sizeof(E));
+    if(newArray==NULL)return 0;
+    stack->array=newArray;
+    stack->capacity=newCapacity;
+  }
+  stack->array[stack->top+1]=element;
+  stack->top++;
+  return 1;
+}
+bool isEmpty(ArrayStack stack){
+  return stack->top==-1;
+}
+E popStack(ArrayStack stack){
+  return stack->array[stack->top--];  
+}
+//链表实现栈
