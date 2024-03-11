@@ -171,3 +171,51 @@ E popStack(ArrayStack stack){
   return stack->array[stack->top--];  
 }
 //链表实现栈
+struct LNode{
+  E element;
+  struct LNode * next;
+};
+typedef struct LNode * Node;
+void initStack(Node head){
+  node->next=NULL;
+}
+bool pushStack(Node head,E element){
+  Node node=malloc(sizeof(struct LNode));
+  if(node==NULL)return 0;
+  node->element=element;
+  node->next=head->next;
+  head->next=node;
+  return 1;
+}
+bool isEmpty(){
+  return head->next==NULL;
+}
+E popStack(Node head){
+  Node tmp=head->next;
+  E e=tmp->element;
+  head->next=head->next->next;
+  free(tmp);
+  return e;
+}
+-------------------------------------------------------
+//队列FIFO:一般采用循环队列，牺牲一个单元用于判断满否
+//顺序表实现队列
+struct Queue{
+  E * array;
+  int capacity;
+  int rear,front;
+};
+typedef struct Queue * ArrayQueue;
+bool initQueue(ArrayQueue queue){
+  queue->array=malloc(sizeof(E)*10);
+  if(queue->array==NULL)return 0;
+  queue->capacity=10;
+  queue->front=queue->rear=0;
+  return 1;
+}
+bool offerQueue(ArrayQueue queue,E element){
+  if((queue->rear+1)%queue->capacity==queue->front)return 0;
+  queue->rear=(queue->rear++)%queue->capacity;
+  queue->array[queue->rear]=element;
+  return 1;
+}
