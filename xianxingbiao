@@ -214,8 +214,133 @@ bool initQueue(ArrayQueue queue){
   return 1;
 }
 bool offerQueue(ArrayQueue queue,E element){
-  if((queue->rear+1)%queue->capacity==queue->front)return 0;
-  queue->rear=(queue->rear++)%queue->capacity;
+  if((queue->rear+1)%queue->capacity==queue->front)return 0;//队列满
+  queue->rear=(queue->rear+1)%queue->capacity;//队列不满时，对队尾的序号和空间赋值
   queue->array[queue->rear]=element;
   return 1;
+}
+bool isEmpty(ArrayQueue queue){
+  return queue->rear==queue->front;
+}
+E pollQueue(ArrayQueue queue){
+  queue->front=(queue->front+1)%queue->capacity;//出栈后移
+  return queue->array[queue->front];//返回
+}
+//链表实现队列
+struct ListNode{
+  E element;
+  struct ListNode * next;
+};
+typedef struct ListNode * Node;
+struct Queue{
+  Node front,rear;
+};//链表由结点组成，队列需要两个结点来完成FIFO
+typedef struct Queue * LinkedQueue;
+bool initQueue(LinkedQueue queue){
+  Node node = malloc(sizeof(struct LNode));//申请
+  if(node==NULL)return 0;
+  queue->rear=queue->front=node;
+  return 1;
+}
+bool offerQueue(LinkedQueue queue,E element){//头结点不存数据
+  Node node=malloc(sizeof(struct LNode));
+  if(node==NULL)return 0;
+  node->element=element;
+  queue->rear->next=node;//把当下这个尾结点的下一个位置插入node
+  queue->rear=node;//node变成新的尾结点
+  return 1;
+}
+E pollQueue(LinkedQueue queue){
+  Node tmp=queue->front->next;//临时结点存储要出列的值，注意头结点不存储值
+  E e=queue->front->element;
+  queue->front->next=queue->front->next->next;//结点后移
+  if(queue->rear==node)queue->rear=queue->front;//队尾队首相撞修改尾结点
+  free(node);//释放结点
+  return e;
+}//isEmpty略
+-------------------------------------------------------------------
+//链表实战
+//LeetCode83.删除排序链表中重复元素
+struct ListNode* deleteDuplicates(struct ListNode* head) {
+  if(head==NULL)return NULL;//空链表
+  struct ListNode * node=head;
+  while(node->next!=NULL){
+    if(node->val==node->next->val)//相同时不移指针只删除一次重复值
+      node->next=node->next->next;
+    else
+      node=node->next;//指针移到下一个位置开始另一个数的去重
+  }
+  return head;
+}
+//LeetCode206.反转链表
+struct ListNode* reverseList(struct ListNode* head) {//注意这里的头结点不为空
+  struct ListNode* newHead=NULL,* tmp;//建立了一个新链表和一个临时结点
+  while(head){
+    tmp=head->next;//临时结点暂存旧链表的下一个结点，也就是即将成为新头的点     eg.tmp存储3的位置
+    head->next=newHead;//头结点原本指向下一个结点现在指向新链表表头，就和原来链表断开连接，同时与newHead建立连接   eg.2原来指向3现在改为指向1
+    newHead=head;//新链表表头赋值为被断开的结点   eg.2变成新的头（现在指向1）
+    head=tmp;//旧链表指向新头   eg.新头是3
+//这里的理解就是重在把->指向的左方要理解成1指向2而不是直接就是2，把head当成被切割下来的结点
+  }
+  return newHead;
+}
+//LeetCode61.旋转链表
+struct ListNode* rotateRight(struct ListNode* head, int k) {
+  if(head==NULL || k==0)return head;//空表或者不动表
+  struct ListNode* node=head,*res;
+  int len=1;
+  while(node->next){
+    node=node->next;
+    len++;
+  }
+  if(k%len==0)return head;//不动表
+  //动表并且切开
+  node->next=head;//求出链表长度并且连成环形
+  for(int i=0;i<len-k%len-1;i++)head=head->next;//目标是把head移动到新头结点的前一个结点，len-k%len然后-1次
+  res=head->next;
+  head->next=NULL;
+  return res;
+}
+//LeetCode20.有效的括号
+bool isValid(char* s) {
+  struct LNode head;
+  initStack(&head);
+  int len=strlen(s);
+  if(len%2!=0)return 0;
+  for(int i=0;i<len;i++){
+    char c=s[i];
+    if(c=='{' || '[' || '(')
+      pushStack(&head,c);
+    else{
+      if(isEmpty(&head))return 0;//右边符号多于左边
+      if(c==')'&&popStack(&head)!='(') return 0;
+      else if(c==']'&&popStack(&head)!='[') return 0;
+      else if(c=='}'&&popStack(&head)!='{') return 0;
+    }
+  }
+  return isEmpty(&head);//为空结束不为空说明左边大于右边
+}//用栈，左边入栈，右边匹配
+//第k个缺失的正整数
+int findKthPositive(int* arr, int arrSize, int k){
+  int j=1,i=0;
+  while(i<arrSize){//i是数组下标
+    if(arr[i]!=j)//j是从一开始的数
+    {  if(--k==0)return j;}//当k为0时返回arr[i]
+    else i++;//相等时i就要向后移动
+    j++;//无论相等与否每比较完一次j就向后移动一次
+    //注意j!=arrSize因为i不是每次都加1
+  }
+  return j+k-1;//超出arrSize范围则直接算
+//j此时为arr[arrSize-1]+1，此时k已经减去不相等的数，这样再相加，减去1
+//这里为什么+1的解析：最后一次比较一定是相等的，此时j=arr[arrSize-1]，运行完这一步后i++和j++，故而+1
+}
+int findKthPositive(int* arr, int arrSize, int k){
+  if(arr[0]>k)return k;//根本不在中间的特殊情况
+  int l=0,r=arrSize;
+  while(l<r){//二分比较
+    int mid=(l+r)/2;
+    if(arr[mid]-mid-1>=k){r=mid;}//右边不相等的个数超过k则
+    else l=mid+1;
+  }
+  return k-(arr[l-1]-(l-1)-1)+arr[l-1];
 }
