@@ -45,3 +45,51 @@ void preOrder(Node root){
     root=root->right;
   }
 }//前序遍历，栈
+void inOrder(Node root){
+  if(root==NULL)return;
+  inOrder(root->left);
+  printf("%d",root->element);
+  inOrder(root->right);
+}//中序遍历(数据分布呈现出以中央为核心的效果)，递归方法
+void inOrder(Node root){
+  struct Stack head;
+  initStack(&head);
+  while(root||!isEmpty(&head)){
+    while(root){
+      pushStack(&head,root);//左边的结点入栈
+      root=root->left;
+    }
+    Node node=popStack(&head);//左边不再有结点就出栈
+    printf("%d",node->element);//打印的是出栈这个点
+    root=root->right;
+  }
+}//中序遍历，栈
+void postOrder(Node root){
+  if(root==NULL)return;
+  inOrder(root->left);
+  inOrder(root->right);
+  printf("%d",root->element);
+}//后序遍历(数据分布呈现出以中央为核心的效果)，递归方法
+void inOrder(Node root){
+  struct Stack head;
+  initStack(&head);
+  while(root||!isEmpty(&head)){
+    while(root){
+      pushStack(&head,root);//左边的结点入栈
+      root=root->left;
+    }
+    Node node=popStack(&head);//左边不再有结点就出栈
+    printf("%d",node->element);//打印的是出栈这个点
+    root=root->right;
+  }
+}//中序遍历，栈
+
+
+
+
+
+
+
+
+
+
