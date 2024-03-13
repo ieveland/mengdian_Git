@@ -48,7 +48,7 @@ void preOrder(Node root){
 void inOrder(Node root){
   if(root==NULL)return;
   inOrder(root->left);
-  printf("%d",root->element);
+  printf("%d",root->element);//左边的入栈了并没有打印，只打印了左边最后一个，层层递归上去才会继续打印
   inOrder(root->right);
 }//中序遍历(数据分布呈现出以中央为核心的效果)，递归方法
 void inOrder(Node root){
@@ -66,30 +66,41 @@ void inOrder(Node root){
 }//中序遍历，栈
 void postOrder(Node root){
   if(root==NULL)return;
-  inOrder(root->left);
-  inOrder(root->right);
+  postOrder(root->left);
+  postOrder(root->right);
   printf("%d",root->element);
 }//后序遍历(数据分布呈现出以中央为核心的效果)，递归方法
-void inOrder(Node root){
+void postOrder(Node root){
   struct Stack head;
   initStack(&head);
   while(root||!isEmpty(&head)){
     while(root){
       pushStack(&head,root);//左边的结点入栈
+      root->flag=0;
       root=root->left;
     }
-    Node node=popStack(&head);//左边不再有结点就出栈
-    printf("%d",node->element);//打印的是出栈这个点
-    root=root->right;
+    root=head->next->element;//这里是求栈顶元素，右子树还没有遍历于是不能出栈
+    if(root->flag==0){
+      root->flag=1;
+      root=root->right;//赋值1并且遍历右子树
+    }else{
+      printf("%d",node->element);//左右遍历完就可以打印了
+      popStack(&head);
+      root=NULL;//如果打印出来就置为空跳过下一轮循环，去找栈顶元素
+    }
   }
-}//中序遍历，栈
-
-
-
-
-
-
-
+}//后序遍历，栈：此时需要flag值标明，0为左子树遍历完成，1为右子树遍历完成
+void levelOrder(Node root){
+  struct Queue queue;
+  initQueue(&queue);
+  offerQueue(&queue,root);
+  while(!isEmpty(&queue)){
+    Node node=pollQueue(&queue);
+    printf("%c",node->element);
+    if(root->left)offerQueue(&queue,root->left);
+    if(root->right)offerQueue(&queue,root->right);
+  }
+}//层序遍历，队列实现(出队时左右结点依次入队)
 
 
 
