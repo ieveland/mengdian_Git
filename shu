@@ -1,5 +1,47 @@
 //树
 ---------------------------------------------------------------
 //二叉树:度最大为二，结点有左右之分;满二叉树：左右结点都有切叶子结点在同一层;完全二叉树：从左往右最后一层有空缺
+//以下采用链表实现
 //树->二叉树：最左边孩子结点->左子树结点，兄弟结点->右子树结点（转换后根节点一定没有右子树）
 //森林->二叉树：先将树变为二叉树，然后依次连接到二叉树的右子树
+//求N个结点可以构成多少个树(动态规划解决)
+int main(){
+  int size;
+  scanf("%d",&size);
+  int dp[size+1];
+  dp[0]=dp[1]=1;
+  for(int i=2;i<=size;i++){
+    dp[i]=0;
+    for(int j=0;j<i;j++){
+       dp[i]+=dp[j]*dp[i-j-1]; 
+    }
+  }
+  printf("%d",dp[size]);
+}//又叫卡特兰数，有公式(2n)!/n!x(n+1)!
+//构建二叉树
+typedef char E;
+struct TreeNode{
+  E element;
+  struct TreeNode * left,right;
+};
+typedef struct TreeNode * Node;
+//二叉树的遍历
+void preOrder(Node root){
+  if(root==NULL)return;
+  printf("%d",root->element);
+  preOrder(root->left);
+  preOrder(root->right);
+}//前序遍历，递归方法
+void preOrder(Node root){
+  struct Stack head;
+  initStack(&head);
+  while(root){
+    while(root){
+      printf("%d",root->element);
+      pushStack(&head,root);
+      root=root->left;
+    }
+    Node node=popStack(&head);
+    root=root->right;
+  }
+}//前序遍历，栈
