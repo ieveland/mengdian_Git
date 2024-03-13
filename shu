@@ -35,7 +35,7 @@ void preOrder(Node root){
 void preOrder(Node root){
   struct Stack head;
   initStack(&head);
-  while(root){
+  while(root||!isEmpty(&head)){
     while(root){
       printf("%d",root->element);
       pushStack(&head,root);
